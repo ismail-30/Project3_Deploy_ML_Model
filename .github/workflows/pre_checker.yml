@@ -1,0 +1,28 @@
+name: pre_checker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pre_checker:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Set up Anaconda environment
+      uses: conda-incubator/setup-conda@v2
+      with:
+        environment-file: environment.yml
+
+    - name: Run Flake8
+      run: |
+        flake8 .
+
+    - name: Run pytest
+      run: |
+        pytest
