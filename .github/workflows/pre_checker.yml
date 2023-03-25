@@ -1,34 +1,28 @@
-name: pre_checker
+name: Python CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  pre_checker:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-      
-    - name: Set up Anaconda environment
-      uses: conda-incubator/setup-miniconda@v2
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
       with:
-        environment-file: environment.yml
-        
-    - name: Initialize conda
-      run: conda init bash && source ~/.bashrc
-      
-    - name: Activate conda environment
-      run: conda activate Deploy_ML
-      
-    - name: Run Flake8
+        python-version: "3.8"
+    - name: Install dependencies
       run: |
-        flake8 .
-
-    - name: Run pytest
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Lint with flake8
       run: |
-        pytest
+        flake8
+    - name: Test with pytest
+      run: |
+        pytest -vv
