@@ -7,21 +7,24 @@ on:
 
 jobs:
   pre_checker:
+
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
+      
     - name: Set up Anaconda environment
       uses: conda-incubator/setup-miniconda@v2
       with:
         environment-file: environment.yml
-
-    - name: Initialize conda shell
-      run: |
-        conda init bash
-        conda activate Deploy_ML
-
+        
+    - name: Initialize conda
+      run: conda init bash && source ~/.bashrc
+      
+    - name: Activate conda environment
+      run: conda activate Deploy_ML
+      
     - name: Run Flake8
       run: |
         flake8 .
