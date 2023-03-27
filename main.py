@@ -1,13 +1,11 @@
+import pickle
+import uvicorn
+import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional
-import pandas as pd
-import pickle
-
 from starter.ml.data import process_data
 from starter.ml.model import inference
 
-import uvicorn
 
 
 # Data Class Definition
@@ -55,20 +53,29 @@ app = FastAPI()
 MODELS = {}
 
 # Load models
+
+
 @app.on_event("startup")
-async def startup_event(): 
-    model_paths = {'model':'model/model.pkl','encoder':'model/encoder.pkl','lb':'model/lb.pkl'}
-    for path_key,path in model_paths.items():
-        with open(path,'rb') as f:
-            MODELS[path_key] = pickle.load(f)
+async def startup_event():
+    model_paths = {
+        'model': 'model/model.pkl',
+        'encoder': 'model/encoder.pkl',
+        'lb': 'model/lb.pkl'}
+    for path_key, path in model_paths.items():
+        with open(path, 'rb') as file:
+            MODELS[path_key] = pickle.load(file)
     return MODELS
 
 # Show a welcome msg
+
+
 @app.get('/')
 async def welcome():
-    return {'msg':'Welcome to Census data salary prediction!'}
+    return {'msg': 'Welcome to Census data salary prediction!'}
 
 # Model Inference
+
+
 @app.post('/predict')
 async def predict(input: CensusData):
     """ Send POST request with input data
@@ -99,15 +106,16 @@ async def predict(input: CensusData):
 
     # Prepare Data
     input_data = input.dict(by_alias=True)
-    input_df = pd.DataFrame(input_data,index=[0])
+    input_df = pd.DataFrame(input_data, index=[0])
 
     # Preprocess data
-    X, y, _, _ = process_data(input_df, categorical_features=cat_features, label=None, encoder=MODELS['encoder'], lb=MODELS['lb'], training=False)
+    X, _, _, _ = process_data(input_df, categorical_features=cat_features,
+                              label=None, encoder=MODELS['encoder'], lb=MODELS['lb'], training=False)
 
     # Prediction
     preds = inference(MODELS['model'], X)
 
-    return {'result':int(preds[0])}
+    return {'result': int(preds[0])}
 
 if __name__ == '__main__':
-    uvicorn.run('main:app',reload=True)
+    uvicorn.run('main:app', reload=True)

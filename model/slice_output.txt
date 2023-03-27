@@ -1,5 +1,80 @@
-Metrics for education:
-Precision: 0.72
-Recall: 0.54
-F1-score: 0.62
+Metrics for education: Some-college
+precision: 0.73
+recall: 0.51
+fbeta: 0.60
+
+Metrics for education: HS-grad
+precision: 0.81
+recall: 0.31
+fbeta: 0.45
+
+Metrics for education: Bachelors
+precision: 0.76
+recall: 0.78
+fbeta: 0.77
+
+Metrics for education: Masters
+precision: 0.83
+recall: 0.86
+fbeta: 0.84
+
+Metrics for education: Assoc-acdm
+precision: 0.75
+recall: 0.64
+fbeta: 0.69
+
+Metrics for education: 7th-8th
+precision: 1.00
+recall: 0.00
+fbeta: 0.00
+
+Metrics for education: 11th
+precision: 1.00
+recall: 0.27
+fbeta: 0.43
+
+Metrics for education: Assoc-voc
+precision: 0.71
+recall: 0.54
+fbeta: 0.61
+
+Metrics for education: Prof-school
+precision: 0.84
+recall: 0.90
+fbeta: 0.87
+
+Metrics for education: 9th
+precision: 1.00
+recall: 0.33
+fbeta: 0.50
+
+Metrics for education: 5th-6th
+precision: 1.00
+recall: 0.50
+fbeta: 0.67
+
+Metrics for education: 10th
+precision: 1.00
+recall: 0.08
+fbeta: 0.15
+
+Metrics for education: Doctorate
+precision: 0.85
+recall: 0.91
+fbeta: 0.88
+
+Metrics for education: 12th
+precision: 1.00
+recall: 0.40
+fbeta: 0.57
+
+Metrics for education: 1st-4th
+precision: 1.00
+recall: 1.00
+fbeta: 1.00
+
+Metrics for education: Preschool
+precision: 1.00
+recall: 1.00
+fbeta: 1.00
 

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from ml.data import process_data
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV
@@ -96,9 +97,12 @@ def performance_overall(model, X, y):
         test labels, binarized
     Returns
     -------
-    precision : float
-    recall : float
-    fbeta : float
+    metrics_dict :
+        dictionary storing different metrics
+        precision : float
+        recall : float
+        fbeta : float
+
     """
 
     preds = inference(model, X)
@@ -107,47 +111,42 @@ def performance_overall(model, X, y):
     return precision, recall, fbeta
 
 
-def performance_on_slice(model, X, y, feature):
+def performance_on_slice(data, cat_features, trained_model, encoder, lb, feature):
+    """ Function for data slicing model performance
+       for a certain categorical column
     """
-    Computes performance metrics for model slices based on the given feature.
+    # get distinct column category value
+    unique_vals = data[feature].unique()
 
-    Inputs
-    ------
-    model : Trained machine learning model.
-    X : np.array
-        Data used for testing.
-    y : np.array
-        Test labels, binarized.
-    feature : str
-        The categorical feature for which the slices will be computed.
-
-    Outputs
-    -------
-    metrics_dict: dict
-         Metrics will be saved in a dictionary for unique value of the feature.
-    """
-    # Get unique values for the feature
-    print(type(X))
-    feature_values = np.unique(X[:, feature])
-
-    # Print performance metrics for each unique value of the feature
     metrics_dict = {}
-    for value in feature_values:
-        X_slice = X[X[:, feature] == value]
-        y_slice = y[X[:, feature] == value]
 
-        if X_slice.size == 0:
-            continue
+    # iterate each value and record the metrics
+    for val in unique_vals:
+        # Fix the feature
+        idx = data[feature] == val
+        reduced_data = data[idx]
 
-        precision, recall, fbeta = performance_overall(model, X_slice, y_slice)
-        
-        metrics_dict[value] = {
-            "Precision": precision,
-            "Recall": recall,
-            "F1-score": fbeta
-        }
+        # Process this subset of data for testing
+        X, y, encoder, lb = process_data(
+            reduced_data,
+            categorical_features=cat_features,
+            label="salary",
+            training=False,
+            encoder=encoder,
+            lb=lb,
+        )
 
-        return metrics_dict
+        # Do the inference and Compute the metrics
+        preds = inference(trained_model, X)
+        precision, recall, fbeta = compute_model_metrics(y, preds)
+
+        metrics_dict[val] = {"precision": precision,
+                             "recall": recall,
+                             "fbeta": fbeta}
+
+    return metrics_dict
+    
+
 
 
 
