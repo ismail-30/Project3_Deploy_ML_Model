@@ -1,0 +1,5 @@
+Metrics for education:
+Precision: 0.72
+Recall: 0.54
+F1-score: 0.62
+
