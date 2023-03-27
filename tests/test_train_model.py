@@ -18,17 +18,9 @@ def raw_data():
     data = pd.read_csv('data/census_cleaned.csv')
     return data
 
-
 @pytest.fixture
-def split_data(raw_data):
-    # Split data into train and test sets
-    train, test = train_test_split(raw_data, test_size=0.20, random_state=42)
-    return train, test
-
-
-@pytest.fixture
-def preprocessed_data(split_data):
-    train, _ = split_data
+def cat_features():
+    # Load raw data
     cat_features = [
         "workclass",
         "education",
@@ -38,7 +30,21 @@ def preprocessed_data(split_data):
         "race",
         "sex",
         "native_country",
-    ]
+    ]    
+    
+    return cat_features
+
+
+@pytest.fixture
+def split_data(raw_data):
+    # Split data into train and test sets
+    train, test = train_test_split(raw_data, test_size=0.20, random_state=42)
+    return train, test
+
+
+@pytest.fixture
+def preprocessed_data(split_data, cat_features):
+    train, _ = split_data
     X_train, y_train, encoder, lb = process_data(
         train, categorical_features=cat_features, label="salary", training=True
     )
@@ -72,18 +78,18 @@ def test_compute_model_metrics(trained_model, preprocessed_data):
     assert fbeta >= 0.6
 
 
-def test_performance_on_slice(trained_model, preprocessed_data):
+def test_performance_on_slice(split_data, trained_model, cat_features):
     model, encoder, lb = trained_model
-    X_train, y_train, _, _ = preprocessed_data
-    feature_idx = 1  # education feature index
-    metrics = performance_on_slice(model, X_train, y_train, feature_idx)
-    for value, metric in metrics.items():
-        for metric_name, metric_value in metric.items():
+    _, test = split_data
+    feature = "education"
+    metrics = performance_on_slice(test, cat_features, model, encoder, lb, feature)
+    for _, metric in metrics.items():
+        for _, metric_value in metric.items():
             assert isinstance(metric_value, float)
 
 
 def test_performance_overall(trained_model, preprocessed_data):
-    model, encoder, lb = trained_model
+    model, _, _ = trained_model
     X_train, y_train, _, _ = preprocessed_data
     metrics = performance_overall(model, X_train, y_train)
     assert len(metrics) == 3
